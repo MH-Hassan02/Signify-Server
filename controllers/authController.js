@@ -138,9 +138,9 @@ export const changePassword = async (req, res) => {
         .status(400)
         .json({ message: "New password must be at least 8 characters long" });
     }
-
     const salt = await bcrypt.genSalt(10);
-    user.password = newPassword;
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+    user.password = hashedPassword;
     await user.save();
 
     res.status(200).json({ message: "Password updated successfully" });
