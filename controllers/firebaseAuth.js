@@ -15,14 +15,14 @@ admin.initializeApp({
 });
 
 export const googleAuth = async (req, res) => {
-  const { email, username, googleId } = req.body;
+  const { email, username, googleId, profilePic } = req.body;
   console.log("req.body", req.body);
 
   try {
     let user = await User.findOne({ email });
 
     if (!user) {
-      user = new User({ username, email, googleId });
+      user = new User({ username, email, googleId, profilePic });
       await user.save();
     }
 

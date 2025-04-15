@@ -8,9 +8,13 @@ const UserSchema = new mongoose.Schema(
     googleId: { type: String, unique: true },
     profilePic: {
       type: String,
-      default: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
+      default:
+        "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
     },
-    contacts: [{ type: mongoose.Schema.Types.ObjectId, ref: "User", default: [] }],
+    statusMessage: { type: String, default: "This is my account" },
+    contacts: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "User", default: [] },
+    ],
     chats: [{ type: mongoose.Schema.Types.ObjectId, ref: "Chat", default: [] }],
   },
   { timestamps: true }
