@@ -40,6 +40,8 @@ export const googleAuth = async (req, res) => {
     const userInfo = {
       username: user.username,
       email: user.email,
+      statusMessage: user.statusMessage,
+      profilePic: user.profilePic,
     };
 
     res.status(200).json({ message: "Google Sign-In successful", user: userInfo });

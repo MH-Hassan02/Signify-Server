@@ -1,4 +1,5 @@
 import Chat from "../models/Chat.js";
+import User from "../models/User.js";
 
 export const createChat = async (req, res) => {
   const { userId, secondUserId } = req.body;
@@ -11,6 +12,15 @@ export const createChat = async (req, res) => {
     if (chat) return res.json(chat);
 
     chat = await Chat.create({ users: [userId, secondUserId] });
+
+    await Promise.all([
+      User.findByIdAndUpdate(userId, {
+        $addToSet: { chats: chat._id },
+      }),
+      User.findByIdAndUpdate(secondUserId, {
+        $addToSet: { chats: chat._id },
+      }),
+    ]);
 
     res.status(201).json(chat);
   } catch (err) {

@@ -54,6 +54,8 @@ export const login = async (req, res) => {
     const userInfo = {
       username: user.username,
       email: user.email,
+      statusMessage: user.statusMessage,
+      profilePic: user.profilePic,
     };
 
     res.json({ message: "Login successful", user: userInfo });
