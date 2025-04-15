@@ -41,61 +41,60 @@ io.on("connection", (socket) => {
 
   socket.on("setup", (userData) => {
     if (!userData?._id) return;
-    socket.join(userData._id); // Join user room
+    socket.join(userData._id);
     connectedUsers.add(socket.id);
+    console.log(`🔐 User setup: ${userData.username} (${userData._id})`);
     socket.emit("connected");
   });
 
-  socket.on("join chat", (chatId) => {
-    if (!chatId) return;
-    socket.join(chatId);
+  socket.on("join chat", (room) => {
+    socket.join(room);
+    console.log(`📥 User joined chat room: ${room}`);
+  });
+
+  socket.on("typing", (room) => {
+    socket.in(room).emit("typing");
+  });
+
+  socket.on("stop typing", (room) => {
+    socket.in(room).emit("stop typing");
   });
 
   socket.on("new message", (message) => {
-    const { chatId, receiver, sender } = message || {};
-    if (!chatId || !receiver) return;
+    const chat = message.chat;
+    if (!chat?.users) return console.error("Chat.users not defined");
 
-    socket.to(chatId).emit("message received", message);
+    chat.users.forEach((user) => {
+      if (user._id === message.sender._id) return;
 
-    // Optional: notify receiver personally
-    if (sender?._id !== receiver) {
-      socket.to(receiver).emit("message received", message);
-    }
+      socket.in(user._id).emit("message received", message);
+    });
+
+    console.log(`📨 New message from ${message.sender.username} in chat ${chat._id}`);
   });
 
-  socket.on("typing", ({ to, from }) => {
-    if (!to || !from) return;
-    socket.to(to).emit("typing", { from });
-  });
-
-  socket.on("stop typing", ({ to, from }) => {
-    if (!to || !from) return;
-    socket.to(to).emit("stop typing", { from });
-  });
-
-  // ==== VIDEO CALL EVENTS ====
+  // ---------- Video Call Signaling ----------
   socket.on("call-user", ({ to, offer, from }) => {
-    if (!to || !offer || !from) return;
+    console.log(`📞 Calling user ${to} from ${from.username}`);
     socket.to(to).emit("incoming-call", { offer, from });
   });
 
   socket.on("answer-call", ({ to, answer }) => {
-    if (!to || !answer) return;
+    console.log(`✅ Answering call to ${to}`);
     socket.to(to).emit("call-accepted", { answer });
   });
 
   socket.on("ice-candidate", ({ to, candidate }) => {
-    if (!to || !candidate) return;
+    console.log(`🧊 Forwarding ICE candidate to ${to}`);
     socket.to(to).emit("ice-candidate", { candidate });
   });
 
   socket.on("end-call", ({ to }) => {
-    console.log(to, "to")
-    if (!to) return;
+    console.log(`📴 Ending call for ${to}`);
     socket.to(to).emit("call-ended");
-    console.log("Ended Call")
   });
 
+  // ---------- Cleanup ----------
   socket.on("disconnect", () => {
     console.log("❌ Socket disconnected:", socket.id);
     connectedUsers.delete(socket.id);
