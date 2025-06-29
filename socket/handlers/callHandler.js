@@ -1,6 +1,7 @@
 export function setupCallHandlers(io, socket) {
   socket.on('call-user', ({ to, offer, from }) => {
     if (!to || !offer || !from) return;
+    console.log('Call-user event:', { to, from: from._id });
     socket.to(to).emit('incoming-call', { offer, from });
   });
 
@@ -16,6 +17,7 @@ export function setupCallHandlers(io, socket) {
 
   socket.on('call-received', ({ to }) => {
     if (!to) return;
+    console.log('Call-received event from socket', socket.id, 'to', to);
     socket.to(to).emit('call-received');
   });
 
