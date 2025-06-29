@@ -26,4 +26,17 @@ export function setupCallHandlers(io, socket) {
     socket.to(to).emit('call-ended');
     console.log("Ended Call");
   });
-} 
+
+  // Sign Language Translation Socket Handlers
+  socket.on('gesture-detected', ({ to, gesture, from }) => {
+    if (!to || !gesture || !from) return;
+    console.log('Gesture-detected event:', { to, from, gesture });
+    socket.to(to).emit('gesture-detected', { gesture, from });
+  });
+
+  socket.on('transcript-update', ({ to, transcript, from }) => {
+    if (!to || !transcript || !from) return;
+    console.log('Transcript-update event:', { to, from, transcript: transcript.substring(0, 50) + '...' });
+    socket.to(to).emit('transcript-update', { transcript, from });
+  });
+}
