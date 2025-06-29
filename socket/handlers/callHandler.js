@@ -28,6 +28,12 @@ export function setupCallHandlers(io, socket) {
   });
 
   // Sign Language Translation Socket Handlers
+  socket.on('sign-language-toggle', ({ to, isActive, from }) => {
+    if (!to || !from) return;
+    console.log('Sign-language-toggle event:', { to, from, isActive });
+    socket.to(to).emit('sign-language-toggle', { isActive, from });
+  });
+
   socket.on('gesture-detected', ({ to, gesture, from }) => {
     if (!to || !gesture || !from) return;
     console.log('Gesture-detected event:', { to, from, gesture });
