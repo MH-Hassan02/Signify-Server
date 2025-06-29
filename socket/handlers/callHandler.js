@@ -14,6 +14,11 @@ export function setupCallHandlers(io, socket) {
     socket.to(to).emit('ice-candidate', { candidate });
   });
 
+  socket.on('call-received', ({ to }) => {
+    if (!to) return;
+    socket.to(to).emit('call-received');
+  });
+
   socket.on('end-call', ({ to }) => {
     if (!to) return;
     socket.to(to).emit('call-ended');
